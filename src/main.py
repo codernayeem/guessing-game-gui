@@ -47,8 +47,22 @@ class Application:
         self.max_ent.insert(0, str(range_list[1]))
 
     def set_config(self):
-        # coming soon
-        pass
+        try:
+            self.val1 = int(self.min_ent.get())
+            self.val2 = int(self.max_ent.get())
+
+            if self.val1 > self.val2:
+                tkinter.messagebox.showwarning('Warning', 'Minimum value can not be larger than maximum value.')
+            elif self.val1 == self.val2:
+                tkinter.messagebox.showwarning('Warning', 'Minimum value and maximum value can not be same.')
+            else:
+                global range_list
+                range_list[0] = self.val1
+                range_list[1] = self.val2
+                self.reset()
+        except:
+            tkinter.messagebox.showerror('Error', 'Your input was\'t valid. Please, try again.')
+            self.set_default_config()
 
     def reset(self):
         global minimum, maximum, range_list
