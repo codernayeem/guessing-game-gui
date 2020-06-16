@@ -1,6 +1,10 @@
 from tkinter import *
 import tkinter.messagebox
 
+minimum = 1
+maximum = 100
+range_list = [minimum, maximum]
+
 
 class Application:
     def __init__(self, master):
@@ -39,17 +43,61 @@ class Application:
         self.min_ent.delete(0, END)
         self.max_ent.delete(0, END)
         global range_list
-        self.min_ent.insert(0, '0')
-        self.max_ent.insert(0, '100')
+        self.min_ent.insert(0, str(range_list[0]))
+        self.max_ent.insert(0, str(range_list[1]))
 
     def set_config(self):
         # coming soon
-        self.set_default_config()
+        pass
 
     def reset(self):
-        self.ques.configure(text="Are you Ready?")
-        pass
+        global minimum, maximum, range_list
+        minimum = range_list[0]
+        maximum = range_list[1]
+        self.info_text.configure(text=f'Guess a number between {range_list[0]} and {range_list[1]}.')
+        self.ques.configure(text='Are you ready?')
+        self.yes.configure(text='Yes', command=self.ready)
+        self.no.configure(text='No', command=root.destroy)
     
+    def ready(self):
+        self.yes.configure(command=self.yes_click)
+        self.no.configure(command=self.no_click)
+        self.make_ques()
+
+    def make_ques(self):
+        if not self.check_last():
+            global minimum, maximum
+            self.ques.configure(text=f'Is your number is between {minimum} and {(minimum + maximum) // 2}?')
+
+    def yes_click(self):
+        global maximum, minimum
+        maximum = (minimum + maximum) // 2
+        self.make_ques()
+        
+    def no_click(self):
+        global maximum, minimum
+        minimum = (minimum + maximum) // 2 + 1
+        self.make_ques()
+
+    def check_last(self):
+        global maximum, minimum
+        if maximum - minimum == 1:
+            self.ques.configure(text=f'Is your number is between {maximum} and {maximum+1}?')
+            self.yes.configure(command=lambda: self.result(maximum))
+            self.no.configure(command=lambda: self.result(minimum))
+            return True
+        elif maximum == minimum:
+            self.result(maximum)
+            return True
+        else:
+            return False
+    
+    def result(self, res):
+        self.ques.configure(text=f'Ha! Got it. Your guessed number is {res}.')
+        self.yes.configure(text='Play again', command=self.reset)
+        self.no.configure(text='Exit', command=root.destroy)
+
+
 root = Tk()
 b = Application(root)
 root.geometry("800x450+0+0")
