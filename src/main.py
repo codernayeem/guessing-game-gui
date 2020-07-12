@@ -1,5 +1,5 @@
 # imports
-from tkinter import *
+from tkinter import Tk, Frame, Label, Button, Entry, LEFT, RIGHT, END
 import tkinter.messagebox
 
 # default minimum and maximum value
