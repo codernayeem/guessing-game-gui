@@ -1,13 +1,17 @@
+# imports
 from tkinter import *
 import tkinter.messagebox
 
-minimum = 1
-maximum = 100
+# default minimum and maximum value
+minimum, maximum = 1, 100
+
 range_list = [minimum, maximum]
 
 
 class Application:
     def __init__(self, master):
+        ''' Initialize Game Screen '''
+
         self.master = master
         master.title('Gussing game')
 
@@ -40,80 +44,94 @@ class Application:
         self.reset()
 
     def set_default_config(self):
+        ''' Set default configuration to Screen '''
+
         self.min_ent.delete(0, END)
         self.max_ent.delete(0, END)
-        global range_list
         self.min_ent.insert(0, str(range_list[0]))
         self.max_ent.insert(0, str(range_list[1]))
 
     def set_config(self):
-        try:
-            self.val1 = int(self.min_ent.get())
-            self.val2 = int(self.max_ent.get())
+        ''' Set configuration to Screen '''
 
-            if self.val1 > self.val2:
+        try:
+            val_min = int(self.min_ent.get())
+            val_max = int(self.max_ent.get())
+
+            if val_min > val_max:
                 tkinter.messagebox.showwarning('Warning', 'Minimum value can not be larger than maximum value.')
-            elif self.val1 == self.val2:
+            elif val_min == val_max:
                 tkinter.messagebox.showwarning('Warning', 'Minimum value and maximum value can not be same.')
             else:
                 global range_list
-                range_list[0] = self.val1
-                range_list[1] = self.val2
+                range_list = [val_min, val_max]
                 self.reset()
         except:
-            tkinter.messagebox.showerror('Error', 'Your input was\'t valid. Please, try again.')
+            tkinter.messagebox.showerror('Error', "Your input was't valid. Please, try again.")
             self.set_default_config()
 
     def reset(self):
-        global minimum, maximum, range_list
+        ''' Reset Game and Start Again '''
+
+        global minimum, maximum
         minimum = range_list[0]
         maximum = range_list[1]
-        self.info_text.configure(text=f'Guess a number between {range_list[0]} and {range_list[1]}.')
+
+        self.info_text.configure(text=f'Guess a number between {minimum} and {maximum}.')
         self.ques.configure(text='Are you ready?')
         self.yes.configure(text='Yes', command=self.ready)
-        self.no.configure(text='No', command=root.destroy)
+        self.no.configure(text='Exit', command=root.destroy)
     
     def ready(self):
+        ''' Start asking question '''
+
         self.yes.configure(command=self.yes_click)
-        self.no.configure(command=self.no_click)
+        self.no.configure(text='No', command=self.no_click)
         self.make_ques()
 
     def make_ques(self):
+        ''' Make Questions '''
+
         if not self.check_last():
-            global minimum, maximum
-            self.ques.configure(text=f'Is your number is between {minimum} and {(minimum + maximum) // 2}?')
+            self.ques.configure(text=f'Is your number between {minimum} and {(minimum + maximum) // 2}?')
 
     def yes_click(self):
-        global maximum, minimum
+        ''' Set maximum value on YES click '''
+
+        global maximum
         maximum = (minimum + maximum) // 2
         self.make_ques()
         
     def no_click(self):
-        global maximum, minimum
+        ''' Set minimum value on NO click '''
+        
+        global minimum
         minimum = (minimum + maximum) // 2 + 1
         self.make_ques()
 
     def check_last(self):
-        global maximum, minimum
+        ''' Check if it is time for the last question '''
+
         if maximum - minimum == 1:
-            self.ques.configure(text=f'Is your number is between {maximum} and {maximum+1}?')
+            self.ques.configure(text=f'Is your number between {maximum} and {maximum+1}?')
             self.yes.configure(command=lambda: self.result(maximum))
             self.no.configure(command=lambda: self.result(minimum))
             return True
         elif maximum == minimum:
             self.result(maximum)
             return True
-        else:
-            return False
+        return False
     
     def result(self, res):
+        ''' Show the result '''
+
         self.ques.configure(text=f'Ha! Got it. Your guessed number is {res}.')
         self.yes.configure(text='Play again', command=self.reset)
         self.no.configure(text='Exit', command=root.destroy)
 
 
 root = Tk()
-b = Application(root)
+application = Application(root)
 root.geometry("800x450+0+0")
 root.resizable(False, False)
 
